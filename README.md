@@ -171,9 +171,7 @@ It is designed as an end-to-end ML application rather than just a notebook exper
 
 ## Live demo
 
-Add your deployed app link here after deployment:
-
-[Live App](https://your-app-link.streamlit.app)
+[Live App](https://vansh-movie-recommender-system.streamlit.app/)
 
 ## Resume-ready project summary
 
