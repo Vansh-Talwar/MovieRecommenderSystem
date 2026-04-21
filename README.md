@@ -158,12 +158,16 @@ It is designed as an end-to-end ML application rather than just a notebook exper
 
 ## Screenshots
 
-Add screenshots here after running the app:
+![Search Movie](image/searchmovie.png)
 
-- Home page
-- Personalized recommender tab
-- Similar movies tab
-- Genre exploration tab
+![Similar Movie](image/similarmovie.png)
+
+![ML Based Recommender](image/mbr.png)
+
+![Explore By Genre](image/genre.png)
+
+![Trending Movies](image/trending.png)
+
 
 Example:
 
