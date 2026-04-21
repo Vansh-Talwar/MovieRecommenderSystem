@@ -13,7 +13,7 @@ st.set_page_config(page_title="Movie Recommender", page_icon="🎥")
 st.title("🎥 Movie Recommender System")
 
 
-# Load once per app (get_genres is cached in api.py; this call is cheap afterwards). [web:47]
+# Load once per app (get_genres is cached in api.py; this call is cheap afterwards)
 genre_dict = get_genres() or {}
 
 
@@ -100,7 +100,7 @@ with tab3:
             st.error("Genres not loaded; cannot recommend right now.")
         else:
             with st.spinner("Generating recommendations..."):
-                # recommend_movies does not need extra caching here; it already benefits from cached API calls. [web:47]
+                # recommend_movies does not need extra caching here; it already benefits from cached API calls
                 results = recommend_movies(fav_movies, genre_dict, top_n=top_n)
             if not results:
                 st.info("No recommendations found. Try different favorites.")
@@ -116,7 +116,7 @@ with tab4:
         if st.button("Show Movies by Genre"):
             gid = genre_dict[selected_genre]
             with st.spinner("Loading movies..."):
-                movies = get_movies_by_genre(gid, page=page)  # cached in api.py [web:47]
+                movies = get_movies_by_genre(gid, page=page)  # cached in api.py 
             display_movies(movies)
     else:
         st.error("Could not load genres.")
@@ -126,5 +126,5 @@ with tab5:
     period = st.selectbox("Select Trending Period:", ["day", "week"])
     if st.button("Show Trending Movies"):
         with st.spinner("Loading trending..."):
-            movies = get_trending_movies(period=period, page=1)  # cached in api.py [web:47]
+            movies = get_trending_movies(period=period, page=1)  # cached in api.py 
         display_movies(movies)
