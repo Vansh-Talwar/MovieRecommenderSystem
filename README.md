@@ -181,4 +181,4 @@ Built an end-to-end movie recommendation system using TMDB metadata, TF-IDF text
 
 ## License
 
-This project is for educational and portfolio use.
+This project is for educational and portfolio use
