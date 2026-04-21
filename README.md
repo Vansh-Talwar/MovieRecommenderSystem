@@ -157,24 +157,17 @@ It is designed as an end-to-end ML application rather than just a notebook exper
 - Add filters such as minimum rating, release year, or language.
 
 ## Screenshots
-
+- Search Movie
 ![Search Movie](image/searchmovie.png)
-
+- Similar Movie
 ![Similar Movie](image/similarmovie.png)
-
+- ML Based Recommender
 ![ML Based Recommender](image/mbr.png)
-
+- Explore By Genre
 ![Explore By Genre](image/genre.png)
-
+- Trending Movies
 ![Trending Movies](image/trending.png)
 
-
-Example:
-
-```md
-
-
-```
 
 ## Live demo
 
