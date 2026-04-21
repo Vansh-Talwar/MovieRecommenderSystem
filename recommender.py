@@ -115,7 +115,7 @@ def recommend_movies(
     if not candidates:
         return []
 
-    
+    # 4) Vectorize once (better TF-IDF settings)
     docs = [_movie_text(m) for m in candidates]
     query = " ".join(_movie_text(m) for m in fav_data)
 
@@ -170,7 +170,7 @@ def recommend_movies(
             if pg is not None and genre_counts.get(pg, 0) >= max_per_primary_genre:
                 continue
 
-            
+            # MMR: relevance vs similarity-to-selected tradeoff
             score = relevance_weight * rel[i] - (1.0 - relevance_weight) * max_sim_to_selected[i]
             if score > best_score:
                 best_score = score
