@@ -21,7 +21,6 @@ def get_movies_for_genres(
     seen = set()
     id_to_name = _invert_genres(genre_dict)
 
-    # Rotate sorts to increase catalog coverage without more endpoints. [web:33]
     sort_pool = [
         "popularity.desc",
         "vote_average.desc",  # use vote_count.gte in api.py to avoid junky low-vote items
