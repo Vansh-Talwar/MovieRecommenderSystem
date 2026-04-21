@@ -31,7 +31,7 @@ The personalized recommender uses a **content-based filtering** approach with so
 5. It computes **TF-IDF vectors** for candidate movies and the user preference profile.
 6. It ranks candidates using **cosine similarity**.
 7. It applies a small **quality prior** using vote average and vote count.
-8. It uses **MMR-style reranking**(Maximal Marginal Relevance) to improve diversity and reduce near-duplicate recommendations.
+8. It uses **MMR-style reranking** (Maximal Marginal Relevance) to improve diversity and reduce near-duplicate recommendations.
 
 This helps the system balance:
 - relevance,
@@ -64,8 +64,8 @@ This helps the system balance:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/movie-recommender-system.git
-cd movie-recommender-system
+git clone https://github.com/Vansh-Talwar/MovieRecommenderSystem.git
+cd MovieRecommenderSystem
 ```
 
 ### 2. Create a virtual environment
