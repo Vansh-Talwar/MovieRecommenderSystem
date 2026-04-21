@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 # In dev, override=True helps avoid stale env vars from shell/previous runs.
 # In prod, you can set override=False if you prefer system env to win.
-load_dotenv(override=True)  # [web:32]
+load_dotenv(override=True) 
 
 API_KEY = os.getenv("TMDB_API")
 if not API_KEY:
