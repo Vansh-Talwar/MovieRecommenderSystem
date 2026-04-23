@@ -131,7 +131,7 @@ def recommend_movies(
         max_features=8000,
         ngram_range=(1, 2),
         sublinear_tf=True,
-        min_df=1,       # lowered from 2 so rare but relevant terms count
+        min_df=2,       # lowered from 2 so rare but relevant terms count
         max_df=0.90,
         norm="l2",
     )
