@@ -1,7 +1,11 @@
 # Movie Recommender System
 
 A content-based movie recommendation system built with **Python**, **Streamlit**, **scikit-learn**, and the **TMDB API**.  
-The app allows users to search for movies, explore similar titles, browse by genre, view trending movies, and get personalized recommendations based on their favorite films.
+The app lets users search for movies, find similar titles, browse by genre, view trending movies, and get personalized recommendations based on their favorite films.
+
+## Live Demo
+
+[Live App](https://vansh-movie-recommender-system.streamlit.app/)
 
 ## Features
 
@@ -16,10 +20,10 @@ The app allows users to search for movies, explore similar titles, browse by gen
 
 ## How the recommender works
 
-The personalized recommender uses a **content-based filtering** approach with some ranking improvements:
+The personalized recommender uses a **content-based filtering** approach with ranking improvements:
 
-1. The app searches TMDB for the user’s favorite movies.  
-2. It extracts the genres of those favorites.  
+1. The app searches TMDB for the user’s favorite movies.
+2. It extracts the genres of those favorites.
 3. It builds a candidate pool using:
    - movies fetched from liked genres,
    - optional expansion from TMDB similar-movie recommendations.
@@ -38,16 +42,16 @@ This helps the system balance:
 - content similarity,
 - catalog variety.
 
-## Tech stack
+## Tech Stack
 
-- **Frontend / App UI:** Streamlit 
-- **Backend logic:** Python 
-- **ML / Ranking:** scikit-learn, NumPy 
-- **API source:** TMDB API 
-- **Configuration:** python-dotenv 
+- **Frontend / App UI:** Streamlit
+- **Backend logic:** Python
+- **ML / Ranking:** scikit-learn, NumPy
+- **API source:** TMDB API
+- **Configuration:** python-dotenv
 - **HTTP reliability:** requests + retry session
 
-## Project structure
+## Project Structure
 
 ```bash
 .
@@ -56,6 +60,7 @@ This helps the system balance:
 ├── recommender.py    # Recommendation pipeline and ranking logic
 ├── genre_utils.py    # Genre-based candidate fetching and diversification
 ├── config.py         # Environment variables, timeouts, retries, logging
+├── requirements.txt
 └── README.md
 ```
 
@@ -92,9 +97,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Environment setup
+## Environment Setup
 
-Create a `.env` file in the project root:
+For local development, create a `.env` file in the project root:
 
 ```env
 TMDB_API=your_tmdb_api_key_here
@@ -109,7 +114,9 @@ DEBUG_MODE=False
 
 You can get a TMDB API key from the TMDB developer portal.
 
-## Run the app
+For **Streamlit Community Cloud**, add the secret in the app’s **Secrets** settings instead of committing your real API key to the repository. Streamlit supports secrets management for deployed apps, and root-level secrets can also be exposed as environment variables at runtime. [web:339][web:342]
+
+## Run the App
 
 ```bash
 streamlit run app.py
@@ -117,7 +124,7 @@ streamlit run app.py
 
 Then open the local URL shown in the terminal.
 
-## App sections
+## App Sections
 
 ### Search Movies
 Search for a movie title and display its basic details such as poster, year, and overview.
@@ -134,51 +141,50 @@ Select a genre and browse movies from that category.
 ### Trending Movies
 View trending movies for the day or the week.
 
-## Why this project is interesting
+## Why This Project Is Interesting
 
 This project goes beyond a basic movie search app by combining:
 
-- API integration,
-- caching and retry handling,
-- content-based recommendation,
-- feature engineering from movie metadata,
-- reranking for diversity,
-- an interactive user interface.
+- API integration
+- Caching and retry handling
+- Content-based recommendation
+- Feature engineering from movie metadata
+- Reranking for diversity
+- An interactive user interface
 
 It is designed as an end-to-end ML application rather than just a notebook experiment.
 
-## Future improvements
+## Screenshots
+
+> Replace these paths if your image folder name is different or if the files are stored elsewhere in the repo.
+
+- Search Movie  
+  ![Search Movie](image/searchmovie.png)
+
+- Similar Movie  
+  ![Similar Movie](image/similarmovie.png)
+
+- ML Based Recommender  
+  ![ML Based Recommender](image/mbr.png)
+
+- Explore By Genre  
+  ![Explore By Genre](image/genre.png)
+
+- Trending Movies  
+  ![Trending Movies](image/trending.png)
+
+## Future Improvements
 
 - Add unit tests for helper and recommendation functions.
 - Add evaluation metrics for recommendation quality and diversity.
 - Refactor API and UI concerns more cleanly.
 - Support hybrid recommendations with collaborative filtering signals.
-- Deploy the app publicly and add a live demo link.
 - Add filters such as minimum rating, release year, or language.
 
-## Screenshots
-- Search Movie
-![Search Movie](image/searchmovie.png)
-- Similar Movie
-![Similar Movie](image/similarmovie.png)
-- ML Based Recommender
-![ML Based Recommender](image/mbr.png)
-- Explore By Genre
-![Explore By Genre](image/genre.png)
-- Trending Movies
-![Trending Movies](image/trending.png)
-
-
-## Live demo
-
-Add your deployed app link here after deployment:
-
-[Live App](https://your-app-link.streamlit.app)
-
-## Resume-ready project summary
+## Resume-Ready Project Summary
 
 Built an end-to-end movie recommendation system using TMDB metadata, TF-IDF text features, cosine similarity, and MMR-style reranking, and deployed it as an interactive Streamlit application with caching, retries, and genre/trending discovery features.
 
 ## License
 
-This project is for educational and portfolio use
+This project is for educational and portfolio use.
