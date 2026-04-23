@@ -20,26 +20,18 @@ def _year_token(m: dict) -> str:
 
 
 def _movie_text(m: dict) -> str:
-    # Weight title + genres higher by repeating them (cheap + effective).
     title = (m.get("title") or "").strip()
     overview = (m.get("overview") or "").strip()
     genres = " ".join(m.get("genre_names", []) or [])
     ytok = _year_token(m)
-
-    # Repetition = field weighting
     return f"{title} {title} {genres} {genres} {overview} {ytok}".strip()
 
 
 def _quality_prior(m: dict) -> float:
-    """
-    Small bounded prior in [0, ~1.0] based on TMDB vote stats.
-    Helps avoid weird low-vote picks when text similarity ties.
-    """
-    va = float(m.get("vote_average") or 0.0)          # typically 0-10
+    va = float(m.get("vote_average") or 0.0)
     vc = float(m.get("vote_count") or 0.0)
-
     va_n = np.clip(va / 10.0, 0.0, 1.0)
-    vc_n = np.log1p(vc) / np.log1p(5000.0)            # saturates slowly
+    vc_n = np.log1p(vc) / np.log1p(5000.0)
     return 0.65 * va_n + 0.35 * np.clip(vc_n, 0.0, 1.0)
 
 
@@ -47,15 +39,15 @@ def recommend_movies(
     favorites,
     genre_dict,
     top_n=10,
-    relevance_weight=0.70,          # renamed from lambda_div for clarity
-    candidate_limit=250,
+    relevance_weight=0.70,
+    candidate_limit=400,
     per_genre_limit=40,
     max_pages=3,
     use_similar_expansion=True,
-    similar_expansion_favs=3,       # hard cap API calls
-    quality_weight=0.12,            # 0 disables the prior
+    similar_expansion_favs=3,
+    quality_weight=0.12,
 ):
-    # 1) Resolve favorites (cached in api.py)
+    # ── 1) Resolve favorites ───────────────────────────────
     fav_data = []
     seen_titles = set()
     for title in favorites:
@@ -70,7 +62,7 @@ def recommend_movies(
     if not fav_data:
         return []
 
-    # 2) Collect liked genre names
+    # ── 2) Collect liked genre names ───────────────────────
     liked_genre_names = set()
     for m in fav_data:
         mids = set(m.get("genre_ids", []) or [])
@@ -78,44 +70,59 @@ def recommend_movies(
             if gid in mids:
                 liked_genre_names.add(gname)
 
-    # 3) Candidate pool: genre discover (diversified) + small similar-expansion
-    candidates = get_movies_for_genres(
-        selected_genres=list(liked_genre_names),
-        genre_dict=genre_dict,
-        max_pages=max_pages,
-        per_genre_limit=per_genre_limit,
-        total_limit=candidate_limit,
-        diversify=True,
-    )
+    # ── 3) Candidate pool ──────────────────────────────────
+    candidates = []
+    seen_ids = set()
 
+    # Step 1 — TMDB similar movies first (most targeted signal)
     if use_similar_expansion:
-        seen_ids = {m.get("id") for m in candidates if m.get("id")}
-        for fm in fav_data[:similar_expansion_favs]:
+        for fm in fav_data:
             mid = fm.get("id")
             if not mid:
                 continue
-            recs = get_similar_movies(mid, page=1) or []
-            for r in recs[:30]:
-                rid = r.get("id")
-                if rid and rid not in seen_ids and r.get("overview"):
-                    candidates.append(r)
-                    seen_ids.add(rid)
+            for page in range(1, 6):  # up to 5 pages per favorite
+                recs = get_similar_movies(mid, page=page) or []
+                added = 0
+                for r in recs:
+                    rid = r.get("id")
+                    if rid and rid not in seen_ids and r.get("overview"):
+                        candidates.append(r)
+                        seen_ids.add(rid)
+                        added += 1
+                if added == 0:  # no more results for this movie
+                    break
                 if len(candidates) >= candidate_limit:
                     break
             if len(candidates) >= candidate_limit:
                 break
 
+    # Step 2 — supplement with genre fetching if pool is too small
+    if len(candidates) < 150:
+        genre_movies = get_movies_for_genres(
+            selected_genres=list(liked_genre_names),
+            genre_dict=genre_dict,
+            max_pages=max_pages,
+            per_genre_limit=per_genre_limit,
+            total_limit=candidate_limit,
+            diversify=True,
+        )
+        for m in genre_movies:
+            mid = m.get("id")
+            if mid and mid not in seen_ids:
+                candidates.append(m)
+                seen_ids.add(mid)
+
     if not candidates:
         return []
 
-    # Remove favorites from candidates
+    # ── 4) Remove favorites from candidates ───────────────
     fav_ids = {m.get("id") for m in fav_data if m.get("id")}
     candidates = [m for m in candidates if m.get("id") not in fav_ids]
 
     if not candidates:
         return []
 
-    # 4) Vectorize once (better TF-IDF settings)
+    # ── 5) Vectorize ──────────────────────────────────────
     docs = [_movie_text(m) for m in candidates]
     query = " ".join(_movie_text(m) for m in fav_data)
 
@@ -124,7 +131,7 @@ def recommend_movies(
         max_features=8000,
         ngram_range=(1, 2),
         sublinear_tf=True,
-        min_df=2,
+        min_df=1,       # lowered from 2 so rare but relevant terms count
         max_df=0.90,
         norm="l2",
     )
@@ -134,12 +141,12 @@ def recommend_movies(
     rel = cosine_similarity(q_vec, X).ravel()
     cand_sim = cosine_similarity(X)
 
-    # Add small quality prior (no extra calls)
+    # Add quality prior
     if quality_weight and quality_weight > 0:
         qp = np.array([_quality_prior(m) for m in candidates], dtype=float)
         rel = rel + quality_weight * qp
 
-    # 5) Greedy MMR + genre cap (as you had)
+    # ── 6) Greedy MMR + genre cap ─────────────────────────
     selected_idx = []
     used = np.zeros(len(candidates), dtype=bool)
 
@@ -169,8 +176,6 @@ def recommend_movies(
             pg = primary_genre[i]
             if pg is not None and genre_counts.get(pg, 0) >= max_per_primary_genre:
                 continue
-
-            # MMR: relevance vs similarity-to-selected tradeoff
             score = relevance_weight * rel[i] - (1.0 - relevance_weight) * max_sim_to_selected[i]
             if score > best_score:
                 best_score = score
