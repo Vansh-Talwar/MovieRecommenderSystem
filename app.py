@@ -101,7 +101,14 @@ with tab3:
         else:
             with st.spinner("Generating recommendations..."):
                 # recommend_movies does not need extra caching here; it already benefits from cached API calls
-                results = recommend_movies(fav_movies, genre_dict, top_n=top_n)
+                results = recommend_movies(
+                    fav_movies,
+                    genre_dict,
+                    top_n=top_n,
+                    candidate_limit=500,
+                    per_genre_limit=60,
+                    max_pages=5
+                )
             if not results:
                 st.info("No recommendations found. Try different favorites.")
             else:
